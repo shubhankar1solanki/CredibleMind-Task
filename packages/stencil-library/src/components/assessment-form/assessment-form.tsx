@@ -286,7 +286,7 @@ export class AssessmentForm {
         <div class="bg-[#F8EDEB] p-5 rounded-t-lg">
           <p class="text-base text-[#4B4B4B] mt-3">{this.renderDescription(true)}</p>
         </div>
-        <div class="mt-6 grid">
+        <div class="mt-6 grid grid-cols-3 gap-3">
           {this.algoliaResults.map(result => (
             <div class="mb-4 p-4 border rounded-lg shadow">
               <img src={result.imageUrl} alt={result.title} class="w-full h-48 object-cover mb-4" />
