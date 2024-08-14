@@ -1,5 +1,19 @@
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import tailwind, { tailwindHMR, TailwindConfig } from 'stencil-tailwind-plugin';
+
+import cfg from './tailwind.config';
+
+const twConfigurationFn = (_filename: string, config: TailwindConfig): TailwindConfig => {
+  return {
+    ...config,
+    ...cfg,
+  };
+};
+
+const tailwindOpts = {
+  tailwindConf: twConfigurationFn,
+};
 
 export const config: Config = {
   namespace: 'stencil-library',
@@ -25,7 +39,11 @@ export const config: Config = {
       proxiesFile: '../react-library/lib/components/stencil-generated/index.ts',
     }),
   ],
+  plugins: [tailwind(tailwindOpts), tailwindHMR()],
+  devServer: {
+    reloadStrategy: 'pageReload',
+  },
   testing: {
-    browserHeadless: "new",
+    browserHeadless: 'new',
   },
 };
