@@ -45,9 +45,11 @@
           body: JSON.stringify({ query: FETCH_QUERY }),
         });
         const data = await response.json();
-        console.log(data.data);
-        const assessmentForm = document.getElementById('assessment');
-        assessmentForm.assessmentData = data.data;
+
+        if (data.data) {
+          const assessmentForm = document.getElementById('assessment');
+          assessmentForm.assessmentData = data.data;
+        }
       });
     </script>
   </body>
