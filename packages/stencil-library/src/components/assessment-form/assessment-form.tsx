@@ -1,4 +1,5 @@
 import { Component, Element, Event, EventEmitter, Prop, State, h } from '@stencil/core';
+import algoliasearch from 'algoliasearch/lite';
 
 import ClockSvg from './assets/clock.svg';
 
@@ -62,43 +63,45 @@ export class AssessmentForm {
   @State() progress: number = 1;
   @State() answers: { [key: number]: any } = {};
   @State() isDescriptionTruncated: boolean = true;
-  @State() estimatedTime: number = 2; // In Minutes
 
   @Event() completion: EventEmitter;
   @Event() pageChange: EventEmitter;
 
   @Element() el: HTMLElement;
 
+  private index: any;
+
   componentWillLoad() {
-    this.calculateEstimatedTime();
+    const client = algoliasearch('4WK61QBPDU', 'a3a8a3edba3b7ba9dad65b2984b91e69');
+    this.index = client.initIndex('algolia-recommendation-data');
+  }
+
+  componentDidRender() {
+    this.updateProgress();
   }
 
   calculateEstimatedTime() {
     const totalQuestions = this.assessmentData.assessmentCollection.items[0].questions.pages.reduce((acc, page) => acc + page.elements.length, 0);
-    this.estimatedTime = (totalQuestions * 30) / 60;
+    return (totalQuestions * 30) / 60;
   }
 
-  handleAnswerChange(page: number, questionName: string, answer: any) {
+  handleAnswerChange(questionName: string, answer: any) {
     this.answers = {
       ...this.answers,
-      [`${page}-${questionName}`]: answer,
+      [questionName]: answer,
     };
+
+    this.updateProgress();
   }
 
   renderQuestion(question) {
     const { title, type, choices, labelFalse, labelTrue, isRequired } = question;
-    const answer = this.answers[`${this.currentPage}-${question.name}`] || '';
+    const answer = this.answers[question.name] || '';
 
     switch (type) {
       case 'text':
         return (
-          <text-field
-            name={question.name}
-            questionTitle={title}
-            value={answer}
-            isRequired={isRequired}
-            onValueChange={e => this.handleAnswerChange(this.currentPage, question.name, e.detail)}
-          />
+          <text-field name={question.name} questionTitle={title} value={answer} isRequired={isRequired} onValueChange={e => this.handleAnswerChange(question.name, e.detail)} />
         );
       case 'radiogroup':
         return (
@@ -108,7 +111,7 @@ export class AssessmentForm {
             choices={choices}
             value={answer}
             isRequired={isRequired}
-            onValueChange={e => this.handleAnswerChange(this.currentPage, question.name, e.detail)}
+            onValueChange={e => this.handleAnswerChange(question.name, e.detail)}
           />
         );
       case 'checkbox':
@@ -119,7 +122,7 @@ export class AssessmentForm {
             choices={choices}
             value={answer}
             isRequired={isRequired}
-            onValueChange={e => this.handleAnswerChange(this.currentPage, question.name, e.detail)}
+            onValueChange={e => this.handleAnswerChange(question.name, e.detail)}
           />
         );
       case 'boolean':
@@ -131,7 +134,7 @@ export class AssessmentForm {
             labelFalse={labelFalse}
             value={answer}
             isRequired={isRequired}
-            onValueChange={e => this.handleAnswerChange(this.currentPage, question.name, e.detail)}
+            onValueChange={e => this.handleAnswerChange(question.name, e.detail)}
           />
         );
     }
@@ -172,7 +175,7 @@ export class AssessmentForm {
 
   getUnansweredQuestions() {
     return this.assessmentData.assessmentCollection.items[0].questions.pages[this.currentPage - 1].elements.filter(question => {
-      return !this.answers[`${this.currentPage}-${question.name}`];
+      return !this.answers[question.name];
     });
   }
 
@@ -181,6 +184,11 @@ export class AssessmentForm {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  }
+
+  updateProgress() {
+    const totalPages = this.assessmentData.assessmentCollection.items[0].questions.pages.length;
+    this.progress = (this.currentPage / totalPages) * 100;
   }
 
   handleNext() {
@@ -216,12 +224,12 @@ export class AssessmentForm {
         <div class="bg-[#F8EDEB] p-5 rounded-t-lg">
           <p class="text-2xl text-[#4B4B4B] font-bold">{introTextTitle}</p>
           <p class="flex gap-1 mt-3">
-            <img src={ClockSvg} /> <span class="text-[#4B4B4B]">It only takes {this.estimatedTime} minutes.</span>
+            <img src={ClockSvg} /> <span class="text-[#4B4B4B]">It only takes {this.calculateEstimatedTime()} minutes.</span>
           </p>
           <p class="text-base text-[#4B4B4B] mt-3">{this.renderDescription()}</p>
         </div>
         {/* Progress */}
-        <div class="h-2 bg-blue-500 rounded-full mb-4" style={{ width: `${this.progress}%` }}></div>
+        <div class="absolute h-2 bg-blue-500 rounded-full" style={{ width: `${this.progress}%` }}></div>
         {/* Questions */}
         <div class="p-5 shadow-inner">
           {currentPageData?.map((question, index) => (
@@ -230,7 +238,7 @@ export class AssessmentForm {
         </div>
 
         {/* Navigation */}
-        <div class="flex justify-between mt-4">
+        <div class="flex justify-between mt-1">
           <button
             onClick={() => this.handlePrev()}
             disabled={this.currentPage === 1}
