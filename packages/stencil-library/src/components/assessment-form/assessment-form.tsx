@@ -65,6 +65,7 @@ export class AssessmentForm {
   @State() isDescriptionTruncated: boolean = true;
   @State() algoliaResults: any[] = [];
   @State() isResultLoading: boolean = false;
+  @State() errors: { [key: string]: string } = {};
 
   @Event() completion: EventEmitter;
   @Event() pageChange: EventEmitter;
@@ -92,17 +93,24 @@ export class AssessmentForm {
       ...this.answers,
       [questionName]: answer,
     };
+
+    // Clear error when user answers the question
+    this.errors = {
+      ...this.errors,
+      [questionName]: '',
+    };
   }
 
   renderQuestion(question) {
-    const { title, type, choices, labelFalse, labelTrue, isRequired } = question;
+    const { title, type, choices, labelFalse, labelTrue } = question;
     const answer = this.answers[question.name] || '';
+
+    const error = this.errors[question.name];
+    console.log(error);
 
     switch (type) {
       case 'text':
-        return (
-          <text-field name={question.name} questionTitle={title} value={answer} isRequired={isRequired} onValueChange={e => this.handleAnswerChange(question.name, e.detail)} />
-        );
+        return <text-field name={question.name} questionTitle={title} value={answer} errorMessage={error} onValueChange={e => this.handleAnswerChange(question.name, e.detail)} />;
       case 'radiogroup':
         return (
           <radio-group
@@ -110,7 +118,7 @@ export class AssessmentForm {
             questionTitle={title}
             choices={choices}
             value={answer}
-            isRequired={isRequired}
+            errorMessage={error}
             onValueChange={e => this.handleAnswerChange(question.name, e.detail)}
           />
         );
@@ -121,7 +129,7 @@ export class AssessmentForm {
             questionTitle={title}
             choices={choices}
             value={answer}
-            isRequired={isRequired}
+            errorMessage={error}
             onValueChange={e => this.handleAnswerChange(question.name, e.detail)}
           />
         );
@@ -133,7 +141,7 @@ export class AssessmentForm {
             labelTrue={labelTrue}
             labelFalse={labelFalse}
             value={answer}
-            isRequired={isRequired}
+            errorMessage={error}
             onValueChange={e => this.handleAnswerChange(question.name, e.detail)}
           />
         );
@@ -193,19 +201,44 @@ export class AssessmentForm {
   updateProgress() {
     const totalPages = this.assessmentData.assessmentCollection.items[0].questions.pages.length;
     this.progress = (this.currentPage / totalPages) * 100;
-    console.log(totalPages, this.currentPage, this.progress);
+  }
+
+  validateCurrentPage() {
+    const currentPageData = this.assessmentData.assessmentCollection.items[0].questions.pages[this.currentPage - 1].elements;
+    let valid = true;
+
+    currentPageData.forEach(question => {
+      if (!this.answers[question.name]) {
+        valid = false;
+        this.errors = {
+          ...this.errors,
+          [question.name]: `Answer is required for this question.`,
+        };
+      } else {
+        this.errors = {
+          ...this.errors,
+          [question.name]: '',
+        };
+      }
+    });
+
+    return valid;
   }
 
   handleNext() {
-    const unanswered = this.getUnansweredQuestions();
-    if (unanswered.length > 0) {
-      this.scrollToUnanswered(unanswered[0]);
-    } else if (this.currentPage < this.assessmentData.assessmentCollection.items[0].questions.pages.length) {
-      this.currentPage++;
-      this.pageChange.emit(this.currentPage);
+    if (this.validateCurrentPage()) {
+      if (this.currentPage < this.assessmentData.assessmentCollection.items[0].questions.pages.length) {
+        this.currentPage++;
+        this.pageChange.emit(this.currentPage);
+      } else {
+        this.isResultLoading = true;
+        this.submitAnswers();
+      }
     } else {
-      this.isResultLoading = true;
-      this.submitAnswers();
+      const unanswered = this.getUnansweredQuestions();
+      if (unanswered.length > 0) {
+        this.scrollToUnanswered(unanswered[0]);
+      }
     }
   }
 
@@ -313,17 +346,22 @@ export class AssessmentForm {
         <div class="bg-[#F8EDEB] p-5 rounded-t-lg">
           <p class="text-base text-[#4B4B4B] mt-3">{this.renderDescription(true)}</p>
         </div>
-        <div class="mt-6 grid grid-cols-3 gap-3">
-          {this.algoliaResults.map(result => (
-            <div class="mb-4 p-4 border rounded-lg shadow">
-              <img src={result.imageUrl} alt={result.title} class="w-full h-48 object-cover mb-4" />
-              <h3 class="text-xl font-semibold">{result.title}</h3>
-              <p class="text-sm text-gray-600">Author: {result.author}</p>
-              <p class="text-sm text-gray-600">Type: {result.type}</p>
-              <p class="text-sm text-gray-700 mt-2">{result.description}</p>
-            </div>
-          ))}
-        </div>
+        {}
+        {this.algoliaResults.length > 0 ? (
+          <div class="mt-3 grid grid-cols-3 gap-3 mx-3">
+            {this.algoliaResults.map(result => (
+              <div class="mb-4 p-4 border rounded-lg shadow">
+                <img src={result.imageUrl} alt={result.title} class="w-full h-48 object-cover mb-4" />
+                <h3 class="text-xl font-semibold">{result.title}</h3>
+                <p class="text-sm text-gray-600">Author: {result.author}</p>
+                <p class="text-sm text-gray-600">Type: {result.type}</p>
+                <p class="text-sm text-gray-700 mt-2">{result.description}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="mt-6">No results found for your answers.</div>
+        )}
       </div>
     );
   }

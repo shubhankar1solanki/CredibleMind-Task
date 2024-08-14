@@ -12,7 +12,7 @@ export namespace Components {
         "assessmentData": AssessmentData;
     }
     interface BooleanField {
-        "isRequired": boolean;
+        "errorMessage": string;
         "labelFalse": string;
         "labelTrue": string;
         "name": string;
@@ -21,7 +21,7 @@ export namespace Components {
     }
     interface CheckboxField {
         "choices": string[];
-        "isRequired": boolean;
+        "errorMessage": string;
         "name": string;
         "questionTitle": string;
         "value": string[];
@@ -42,13 +42,13 @@ export namespace Components {
     }
     interface RadioGroup {
         "choices": string[];
-        "isRequired": boolean;
+        "errorMessage": string;
         "name": string;
         "questionTitle": string;
         "value": string;
     }
     interface TextField {
-        "isRequired": boolean;
+        "errorMessage": string;
         "name": string;
         "questionTitle": string;
         "value": string;
@@ -183,7 +183,7 @@ declare namespace LocalJSX {
         "onPageChange"?: (event: AssessmentFormCustomEvent<any>) => void;
     }
     interface BooleanField {
-        "isRequired"?: boolean;
+        "errorMessage"?: string;
         "labelFalse"?: string;
         "labelTrue"?: string;
         "name"?: string;
@@ -193,7 +193,7 @@ declare namespace LocalJSX {
     }
     interface CheckboxField {
         "choices"?: string[];
-        "isRequired"?: boolean;
+        "errorMessage"?: string;
         "name"?: string;
         "onValueChange"?: (event: CheckboxFieldCustomEvent<any>) => void;
         "questionTitle"?: string;
@@ -215,14 +215,14 @@ declare namespace LocalJSX {
     }
     interface RadioGroup {
         "choices"?: string[];
-        "isRequired"?: boolean;
+        "errorMessage"?: string;
         "name"?: string;
         "onValueChange"?: (event: RadioGroupCustomEvent<any>) => void;
         "questionTitle"?: string;
         "value"?: string;
     }
     interface TextField {
-        "isRequired"?: boolean;
+        "errorMessage"?: string;
         "name"?: string;
         "onValueChange"?: (event: TextFieldCustomEvent<any>) => void;
         "questionTitle"?: string;
