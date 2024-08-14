@@ -198,7 +198,6 @@ export class AssessmentForm {
 
   handleNext() {
     const unanswered = this.getUnansweredQuestions();
-    console.log(unanswered, { currentPage: this.currentPage });
     if (unanswered.length > 0) {
       this.scrollToUnanswered(unanswered[0]);
     } else if (this.currentPage < this.assessmentData.assessmentCollection.items[0].questions.pages.length) {

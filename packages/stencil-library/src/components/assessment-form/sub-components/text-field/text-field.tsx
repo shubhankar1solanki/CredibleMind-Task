@@ -20,7 +20,7 @@ export class TextFieldComponent {
 
   render() {
     return (
-      <div class="mb-4">
+      <div class="mb-4" id={`question-${this.questionTitle}`}>
         <label class="block text-gray-700 text-sm font-bold mb-2">
           {this.questionTitle}
           {this.isRequired ? '*' : ''}
