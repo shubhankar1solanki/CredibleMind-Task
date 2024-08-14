@@ -9,6 +9,46 @@
     <script nomodule src="/build/stencil-library.js"></script>
   </head>
   <body>
-    <assessment-form></assessment-form>
+    <assessment-form id="assessment"></assessment-form>
+
+    <!-- For testing -->
+    <script>
+      const Space_ID = 'h3n75a0xb6vi';
+      const Access_Token = '3R9BuNun6VNkwPQnoUFe-N_dVPA77YccpKmKGla7D54';
+      const GQL_Endpoint = 'https://graphql.contentful.com/content/v1/spaces/h3n75a0xb6vi';
+
+      const FETCH_QUERY = `
+        query GetAssessmentDetails {
+          assessmentCollection {
+            items {
+              name
+              slug
+              intro {
+                json
+              }
+              questions
+              resultsIntro {
+                json
+              }
+            }
+          }
+        }
+      `;
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch(GQL_Endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Access_Token}`,
+          },
+          body: JSON.stringify({ query: FETCH_QUERY }),
+        });
+        const data = await response.json();
+
+        const assessmentForm = document.getElementById('assessment');
+        assessmentForm.assessmentData = data.data;
+      });
+    </script>
   </body>
 </html>

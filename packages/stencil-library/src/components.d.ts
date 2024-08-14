@@ -5,8 +5,11 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { AssessmentData } from "./components/assessment-form/assessment-form";
+export { AssessmentData } from "./components/assessment-form/assessment-form";
 export namespace Components {
     interface AssessmentForm {
+        "assessmentData": AssessmentData;
     }
     interface MyComponent {
         /**
@@ -43,6 +46,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface AssessmentForm {
+        "assessmentData"?: AssessmentData;
     }
     interface MyComponent {
         /**
