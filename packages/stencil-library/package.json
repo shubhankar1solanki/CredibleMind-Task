@@ -52,6 +52,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "algoliasearch": "^5.0.0"
+    "algoliasearch": "^4.24.0"
   }
 }

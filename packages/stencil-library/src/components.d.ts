@@ -16,7 +16,7 @@ export namespace Components {
         "labelFalse": string;
         "labelTrue": string;
         "name": string;
-        "title": string;
+        "questionTitle": string;
         "value": boolean;
     }
     interface CheckboxField {
@@ -188,7 +188,7 @@ declare namespace LocalJSX {
         "labelTrue"?: string;
         "name"?: string;
         "onValueChange"?: (event: BooleanFieldCustomEvent<any>) => void;
-        "title"?: string;
+        "questionTitle"?: string;
         "value"?: boolean;
     }
     interface CheckboxField {

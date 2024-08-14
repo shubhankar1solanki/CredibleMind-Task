@@ -63,6 +63,7 @@ export class AssessmentForm {
   @State() progress: number = 1;
   @State() answers: { [key: number]: any } = {};
   @State() isDescriptionTruncated: boolean = true;
+  @State() algoliaResults: any[] = [];
 
   @Event() completion: EventEmitter;
   @Event() pageChange: EventEmitter;
@@ -78,6 +79,7 @@ export class AssessmentForm {
 
   componentDidRender() {
     this.updateProgress();
+    console.log(this.answers);
   }
 
   calculateEstimatedTime() {
@@ -129,7 +131,7 @@ export class AssessmentForm {
         return (
           <boolean-field
             name={question.name}
-            title={title}
+            questionTitle={title}
             labelTrue={labelTrue}
             labelFalse={labelFalse}
             value={answer}
@@ -175,7 +177,7 @@ export class AssessmentForm {
 
   getUnansweredQuestions() {
     return this.assessmentData.assessmentCollection.items[0].questions.pages[this.currentPage - 1].elements.filter(question => {
-      return !this.answers[question.name];
+      return Array.isArray(this.answers[question.name]) ? this.answers[question.name].length === 0 : !this.answers[question.name];
     });
   }
 
@@ -193,13 +195,14 @@ export class AssessmentForm {
 
   handleNext() {
     const unanswered = this.getUnansweredQuestions();
+    console.log(unanswered);
     if (unanswered.length > 0) {
       this.scrollToUnanswered(unanswered[0]);
     } else if (this.currentPage < this.assessmentData.assessmentCollection.items[0].questions.pages.length) {
       this.currentPage++;
       this.pageChange.emit(this.currentPage);
     } else {
-      // Submit answers
+      this.submitAnswers();
     }
   }
 
@@ -207,6 +210,31 @@ export class AssessmentForm {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.pageChange.emit(this.currentPage);
+    }
+  }
+
+  async submitAnswers() {
+    try {
+      console.log(this.answers, 'Answers');
+      const facetFilters = Object.entries(this.answers)
+        .map(([key, value]) => {
+          if (Array.isArray(value)) {
+            return value.map(v => `relevantTo:${key}:${v}`);
+          } else if (typeof value === 'boolean') {
+            return `relevantTo:${key}:${value ? 'Yes' : 'No'}`;
+          } else {
+            return `relevantTo:${key}:${value}`;
+          }
+        })
+        .flat();
+      const response = await this.index.search('', { facetFilters: [facetFilters] });
+      this.algoliaResults = response.hits;
+      this.currentPage++;
+      console.log(this.algoliaResults, 'Results');
+      this.completion.emit(this.answers);
+    } catch (error) {
+      console.error('Algolia search error:', error);
+      // Fallback logic
     }
   }
 

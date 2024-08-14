@@ -7,7 +7,7 @@ import { Component, h, Prop, Event, EventEmitter } from '@stencil/core';
 })
 export class BooleanFieldComponent {
   @Prop() name: string;
-  @Prop() title: string;
+  @Prop() questionTitle: string;
   @Prop() labelTrue: string;
   @Prop() labelFalse: string;
   @Prop() value: boolean;
@@ -23,7 +23,7 @@ export class BooleanFieldComponent {
     return (
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2">
-          {this.title}
+          {this.questionTitle}
           {this.isRequired ? '*' : ''}
         </label>
         <div>
