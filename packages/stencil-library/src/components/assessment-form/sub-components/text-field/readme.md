@@ -7,12 +7,12 @@
 
 ## Properties
 
-| Property        | Attribute        | Description | Type      | Default     |
-| --------------- | ---------------- | ----------- | --------- | ----------- |
-| `isRequired`    | `is-required`    |             | `boolean` | `undefined` |
-| `name`          | `name`           |             | `string`  | `undefined` |
-| `questionTitle` | `question-title` |             | `string`  | `undefined` |
-| `value`         | `value`          |             | `string`  | `undefined` |
+| Property        | Attribute        | Description | Type     | Default     |
+| --------------- | ---------------- | ----------- | -------- | ----------- |
+| `errorMessage`  | `error-message`  |             | `string` | `undefined` |
+| `name`          | `name`           |             | `string` | `undefined` |
+| `questionTitle` | `question-title` |             | `string` | `undefined` |
+| `value`         | `value`          |             | `string` | `undefined` |
 
 
 ## Events

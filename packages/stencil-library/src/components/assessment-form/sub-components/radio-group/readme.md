@@ -10,7 +10,7 @@
 | Property        | Attribute        | Description | Type       | Default     |
 | --------------- | ---------------- | ----------- | ---------- | ----------- |
 | `choices`       | --               |             | `string[]` | `undefined` |
-| `isRequired`    | `is-required`    |             | `boolean`  | `undefined` |
+| `errorMessage`  | `error-message`  |             | `string`   | `undefined` |
 | `name`          | `name`           |             | `string`   | `undefined` |
 | `questionTitle` | `question-title` |             | `string`   | `undefined` |
 | `value`         | `value`          |             | `string`   | `undefined` |
