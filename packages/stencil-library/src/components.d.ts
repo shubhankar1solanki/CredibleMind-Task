@@ -25,6 +25,16 @@ export namespace Components {
          */
         "middle": string;
     }
+    interface TextField {
+        "isRequired": boolean;
+        "name": string;
+        "questionTitle": string;
+        "value": string;
+    }
+}
+export interface TextFieldCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLTextFieldElement;
 }
 declare global {
     interface HTMLAssessmentFormElement extends Components.AssessmentForm, HTMLStencilElement {
@@ -39,9 +49,27 @@ declare global {
         prototype: HTMLMyComponentElement;
         new (): HTMLMyComponentElement;
     };
+    interface HTMLTextFieldElementEventMap {
+        "valueChange": any;
+    }
+    interface HTMLTextFieldElement extends Components.TextField, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLTextFieldElementEventMap>(type: K, listener: (this: HTMLTextFieldElement, ev: TextFieldCustomEvent<HTMLTextFieldElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLTextFieldElementEventMap>(type: K, listener: (this: HTMLTextFieldElement, ev: TextFieldCustomEvent<HTMLTextFieldElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLTextFieldElement: {
+        prototype: HTMLTextFieldElement;
+        new (): HTMLTextFieldElement;
+    };
     interface HTMLElementTagNameMap {
         "assessment-form": HTMLAssessmentFormElement;
         "my-component": HTMLMyComponentElement;
+        "text-field": HTMLTextFieldElement;
     }
 }
 declare namespace LocalJSX {
@@ -62,9 +90,17 @@ declare namespace LocalJSX {
          */
         "middle"?: string;
     }
+    interface TextField {
+        "isRequired"?: boolean;
+        "name"?: string;
+        "onValueChange"?: (event: TextFieldCustomEvent<any>) => void;
+        "questionTitle"?: string;
+        "value"?: string;
+    }
     interface IntrinsicElements {
         "assessment-form": AssessmentForm;
         "my-component": MyComponent;
+        "text-field": TextField;
     }
 }
 export { LocalJSX as JSX };
@@ -73,6 +109,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "assessment-form": LocalJSX.AssessmentForm & JSXBase.HTMLAttributes<HTMLAssessmentFormElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "text-field": LocalJSX.TextField & JSXBase.HTMLAttributes<HTMLTextFieldElement>;
         }
     }
 }

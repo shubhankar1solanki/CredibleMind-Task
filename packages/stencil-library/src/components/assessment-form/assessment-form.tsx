@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, State, h } from '@stencil/core';
 
 interface RichTextContent {
   data: Record<string, any>;
@@ -30,10 +30,6 @@ interface QuestionPage {
   elements: QuestionElement[];
 }
 
-interface Questions {
-  pages: QuestionPage[];
-}
-
 interface AssessmentItem {
   name: string;
   slug: string;
@@ -43,15 +39,13 @@ interface AssessmentItem {
   resultsIntro: {
     json: RichTextContent;
   };
-  questions: Questions;
-}
-
-interface AssessmentCollection {
-  items: AssessmentItem[];
+  questions: {
+    pages: QuestionPage[];
+  };
 }
 
 export interface AssessmentData {
-  assessmentCollection: AssessmentCollection;
+  assessmentCollection: { items: AssessmentItem[] };
 }
 
 @Component({
@@ -62,10 +56,47 @@ export interface AssessmentData {
 export class AssessmentForm {
   @Prop() assessmentData: AssessmentData;
 
+  @State() currentPage: number = 1;
+  @State() progress: number = 1;
+  @State() answers: { [key: number]: any } = {};
+
+  handleAnswerChange(page: number, questionName: string, answer: any) {
+    this.answers = {
+      ...this.answers,
+      [`${page}-${questionName}`]: answer,
+    };
+  }
+
+  renderQuestion(question) {
+    const { title, type, isRequired } = question;
+    const answer = this.answers[`${this.currentPage}-${question.name}`] || '';
+
+    switch (type) {
+      case 'text':
+        return (
+          <text-field
+            name={question.name}
+            questionTitle={title}
+            value={answer}
+            isRequired={isRequired}
+            onValueChange={e => this.handleAnswerChange(this.currentPage, question.name, e.detail)}
+          />
+        );
+    }
+  }
+
   render() {
+    const currentPageData = this.assessmentData?.assessmentCollection.items[0].questions.pages[this.currentPage - 1].elements;
+    const introTextTitle = this.assessmentData?.assessmentCollection.items[0].intro.json.content[0].content[0].value;
+
     return (
-      <div class="bg-indigo-500 p-6 rounded-md flex justify-center">
-        <h1 class="text-white font-sans">This is a Stencil component using Tailwind</h1>
+      <div class="max-w-2xl mx-auto p-5 bg-white shadow-md rounded-lg">
+        <p class="text-2xl">{introTextTitle}</p>
+        <div>
+          {currentPageData?.map((question, index) => (
+            <div key={index}>{this.renderQuestion(question)}</div>
+          ))}
+        </div>
       </div>
     );
   }
