@@ -1,0 +1,3 @@
+import type { JSX } from 'stencil-library';
+export declare const AssessmentForm: import("react").ForwardRefExoticComponent<JSX.AssessmentForm & Omit<import("react").HTMLAttributes<HTMLAssessmentFormElement>, "style"> & import("./react-component-lib/interfaces").StyleReactProps & import("react").RefAttributes<HTMLAssessmentFormElement>>;
+export declare const MyComponent: import("react").ForwardRefExoticComponent<JSX.MyComponent & Omit<import("react").HTMLAttributes<HTMLMyComponentElement>, "style"> & import("./react-component-lib/interfaces").StyleReactProps & import("react").RefAttributes<HTMLMyComponentElement>>;
